@@ -22,7 +22,6 @@ if (-not $pr) {
   -v Verbose `
   -i index-latest `
   -url "https://ci.appveyor.com/api/projects/$index_url_part/artifacts/artifacts/index-latest.bsi?branch=$branch&pr=false" `
-  -name wh40k-ci `
   -no-index-datafiles `
   -bsr-filename latest `
   -additional-urls "https://ci.appveyor.com/api/projects/$index_url_part/artifacts/artifacts/latest.bsr?branch=$branch&pr=false"
