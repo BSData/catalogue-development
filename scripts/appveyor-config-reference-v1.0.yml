@@ -6,7 +6,6 @@
 
 version: '0.0.0.{build}'
 image: Visual Studio 2017
-skip_tags: true
 install:
   - ps: |
       $install_script_url = 'https://raw.githubusercontent.com/BSData/catalogue-development/master/scripts/appveyor-ci-install-script-v1.0.ps1'
@@ -14,7 +13,11 @@ install:
 build_script:
   - ps: |
       $build_script_url = 'https://raw.githubusercontent.com/BSData/catalogue-development/master/scripts/appveyor-ci-build-script-v1.0.ps1'
-      (New-Object System.Net.WebClient).DownloadString($build_script_url) | iex
+      (New-Object System.Net.WebClient).DownloadString($build_script_url) | iexx
+test_script:
+  - ps: |
+      $test_script_url = 'https://raw.githubusercontent.com/BSData/catalogue-development/master/scripts/appveyor-ci-test-script-v1.0.ps1'
+      (New-Object System.Net.WebClient).DownloadString($test_script_url) | iex
 artifacts:
   - path: 'artifacts\*.bsi'
   - path: 'artifacts\*.bsr'
