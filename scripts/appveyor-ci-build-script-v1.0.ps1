@@ -31,7 +31,7 @@ if (-not $pr) {
 
 # for release tags
 
-if ($env:APPVEYOR_REPO_TAG) {
+if ($env:APPVEYOR_REPO_TAG -eq $true) {
 
   echo "Publishing artifacts for $tag release feed"
   
