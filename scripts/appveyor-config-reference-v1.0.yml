@@ -13,7 +13,7 @@ install:
 build_script:
   - ps: |
       $build_script_url = 'https://raw.githubusercontent.com/BSData/catalogue-development/master/scripts/appveyor-ci-build-script-v1.0.ps1'
-      (New-Object System.Net.WebClient).DownloadString($build_script_url) | iexx
+      (New-Object System.Net.WebClient).DownloadString($build_script_url) | iex
 test_script:
   - ps: |
       $test_script_url = 'https://raw.githubusercontent.com/BSData/catalogue-development/master/scripts/appveyor-ci-test-script-v1.0.ps1'
