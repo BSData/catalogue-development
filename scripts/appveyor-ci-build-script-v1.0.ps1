@@ -8,10 +8,12 @@ function BuildScript {
 
 Write-Host "Executing build script v1.0" -fore Green
 
-#setup flags
+#setup variables
+$tag = $env:APPVEYOR_REPO_TAG_NAME
 $pr = $env:APPVEYOR_PULL_REQUEST_NUMBER -ne $null
 $branch = $env:APPVEYOR_REPO_BRANCH
-$index_url_part = "$env:APPVEYOR_ACCOUNT_NAME/$env:APPVEYOR_PROJECT_SLUG"
+$repo_owner,$repo_name = $env:APPVEYOR_REPO_NAME -split '/'
+
 Write-Host "Branch: $branch, is PR: $pr"
 
 # standalone BSR
@@ -19,9 +21,11 @@ wham publish bsr -v Verbose -bsr-filename snapshot
 
 # latest only from non-PR
 if (-not $pr) {
-
   Write-Host "Publishing artifacts for $branch branch-feed - links currently not supported by BattleScribe"
-  $filename_core = "$slug-branch-latest"
+  
+  $slug = $env:APPVEYOR_PROJECT_SLUG
+  $index_url_part = "$env:APPVEYOR_ACCOUNT_NAME/$slug"
+  $filename_core = "$repo_name-branch-latest"
   
   wham publish bsr,bsi `
   -v Verbose `
@@ -35,15 +39,16 @@ if (-not $pr) {
 
 # for release tags
 if ($env:APPVEYOR_REPO_TAG -eq $true) {
+
   Write-Host "Publishing artifacts for $tag release feed" -fore Green
   
   wham publish bsr,bsi `
   -v Verbose `
-  -i $slug `
-  -url "https://github.com/$index_url_part/releases/download/$tag/$slug.bsi" `
+  -i $repo_name `
+  -url "https://github.com/$env:APPVEYOR_REPO_NAME/releases/download/$tag/$repo_name.bsi" `
   -no-index-datafiles `
-  -bsr-filename $slug `
-  -additional-urls "https://github.com/$index_url_part/releases/download/$tag/$slug.bsr"
+  -bsr-filename $repo_name `
+  -additional-urls "https://github.com/$env:APPVEYOR_REPO_NAME/releases/download/$tag/$repo_name.bsr"
 }
 
 } # end BuildScript
