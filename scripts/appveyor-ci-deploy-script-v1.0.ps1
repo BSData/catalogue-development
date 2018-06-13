@@ -6,7 +6,9 @@ function DeployScript {
 # Deploy to GitHub Releases on master branch and when building repo tag
 Write-Host "Executing deployment script v1.0" -fore Green
 
-$upload_asset_names = @("$slug.bsr","$slug.bsi")
+$repo_owner,$repo_name = $env:APPVEYOR_REPO_NAME -split '/'
+$tag = $env:APPVEYOR_REPO_TAG_NAME
+$upload_asset_names = @("$repo_name.bsr","$repo_name.bsi")
 $is_master = $env:APPVEYOR_REPO_BRANCH -eq 'master'
 $is_tag = $env:APPVEYOR_REPO_TAG -eq $true
 Write-Host "Checking deployment conditions. Branch: $env:APPVEYOR_REPO_BRANCH, building tag: $is_tag"
@@ -22,7 +24,7 @@ if (-not $is_master -or -not $is_tag) {
   return;
 }
 
-Write-Host "Deploying to GiHub Release started..."
+Write-Host "Deploying to GiHub Release $tag started..."
 try {
   # get release from tag
   $release_details_url = "https://api.github.com/repos/$env:APPVEYOR_REPO_NAME/releases/tags/$tag"
@@ -48,7 +50,7 @@ foreach ($name in $upload_asset_names) {
   # now we can upload the artifact
   $response = `
     Invoke-RestMethod $upload_url -Method Post `
-    -InFile "artifacts\\$_" -ContentType 'application/zip' `
+    -InFile "artifacts\\$name" -ContentType 'application/zip' `
     -Headers @{ 'Authorization'= "Bearer $env:github_auth_token" }
 
   Write-Host $('Release asset available for download at ' + $response.browser_download_url) -fore Green
