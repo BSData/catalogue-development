@@ -18,6 +18,7 @@ Write-Host "Branch: $branch, is PR: $pr"
 
 # standalone BSR
 wham publish bsr -v Verbose -bsr-filename snapshot
+if ($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode)  }
 
 # latest only from non-PR
 if (-not $pr) {
@@ -34,7 +35,7 @@ if (-not $pr) {
   -no-index-datafiles `
   -bsr-filename $filename_core `
   -additional-urls "https://ci.appveyor.com/api/projects/$index_url_part/artifacts/artifacts/$filename_core.bsr?branch=$branch&pr=false"
-  
+  if ($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode)  }
 }
 
 # for release tags
@@ -49,6 +50,7 @@ if ($env:APPVEYOR_REPO_TAG -eq $true) {
   -no-index-datafiles `
   -bsr-filename $repo_name `
   -additional-urls "https://github.com/$env:APPVEYOR_REPO_NAME/releases/download/$tag/$repo_name.bsr"
+  if ($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode)  }
 }
 
 } # end BuildScript
