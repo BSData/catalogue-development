@@ -1,7 +1,8 @@
 name: New repo creator
 
 on:
-  issue_comment: [created]
+  issue_comment:
+    types: [created]
 
 jobs:
   preview:
