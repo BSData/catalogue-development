@@ -21,7 +21,7 @@ jobs:
           $description = $env:issue_title -replace "^New Repo: "
           $name = $description.ToLowerInvariant() -replace "[^a-z0-9]+", '-'
           $body_first_line = $env:issue_body -split "`n" | ? {$_} | select -first 1
-          $name_match = "^(name)|(tag)|(url):\s"
+          $name_match = "^(name|tag|url): "
           if ($body_first_line -match $name_match) {
             $name = $body_first_line -replace $name_match
           }
