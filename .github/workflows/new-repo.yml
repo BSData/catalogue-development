@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       github.event_name == 'issues' &&
-      startsWith(github.event.issue.title, "New Repo")
+      startsWith(github.event.issue.title, 'New Repo')
     steps:
       - name: Add label and assign owner
         uses: Naturalclar/issue-action@v1.0.0
