@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       contains(github.event.issue.labels.*.name, 'new repo') &&
-      contains(['amis92'], github.actor) &&
+      contains(['amis92','Jonskichov'], github.actor) &&
       github.event.comment.body == '.approve'
     
     steps:
