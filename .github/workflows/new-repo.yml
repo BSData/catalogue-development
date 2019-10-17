@@ -1,52 +1,50 @@
 name: New repo creator
 
 on:
+  issues:
+    types: [opened]
   issue_comment:
     types: [created]
 
 jobs:
-  preview:
+  handle_new:
     runs-on: ubuntu-latest
     if: |
-      contains(github.event.issue.labels.*.name, 'new repo') &&
-      github.event.comment.body == '.preview'
+      github.event_name == 'issues' &&
+      startsWith(github.event.issue.title, "New Repo")
     steps:
+      - name: Add label and assign owner
+        uses: Naturalclar/issue-action@v1.0.0
+        with:
+          keywords: '["New Repo"]'
+          assignees: '["amis92"]'
+          labels: '["new repo"]'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v1
       - name: Comment on the issue with preview information for new repo
         env:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          issue_title: ${{ github.event.issue.title }}
-          issue_body: ${{ github.event.issue.body }}
-          comments_url: ${{ github.event.issue.comments_url }}
         shell: pwsh
-        run: |
-          $description = $env:issue_title -replace "^New Repo: "
-          $name = $description.ToLowerInvariant() -replace "[^a-z0-9]+", '-'
-          $body_first_line = $env:issue_body -split "`n" | ? {$_} | select -first 1
-          $name_match = "^(name|tag|url): "
-          if ($body_first_line -match $name_match) {
-            $name = $body_first_line -replace $name_match
-          }
-          $comment = (
-            "**Repository name:** ``$name``",
-            "**Repository description:** ``$description``"
-            ) -join "`n"
-          Write-Output $comment
-          $restParams = @{
-            Method = 'Post'
-            Uri = $env:comments_url
-            Headers = @{
-              Authorization = "token $env:github_token"
-            }
-            ContentType = 'application/json'
-            Body = @{
-              'body' = $comment
-            } | ConvertTo-Json
-          }
-          Invoke-RestMethod @restParams
-
-  create:
+        run: './.github/scripts/NewRepoNamesPreview.ps1'
+    
+  preview_comment:
     runs-on: ubuntu-latest
     if: |
+      github.event_name == 'issue_comment' &&
+      contains(github.event.issue.labels.*.name, 'new repo') &&
+      github.event.comment.body == '.preview'
+    steps:
+      - uses: actions/checkout@v1
+      - name: Comment on the issue with preview information for new repo
+        env:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: './.github/scripts/NewRepoNamesPreview.ps1'
+
+  create_repo:
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'issue_comment' &&
       contains(github.event.issue.labels.*.name, 'new repo') &&
       github.actor == 'amis92' &&
       github.event.comment.body == '.approve'
