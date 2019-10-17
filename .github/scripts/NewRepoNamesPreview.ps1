@@ -4,10 +4,11 @@
 # $env:GITHUB_EVENT_PATH (set in Actions by default)
 # $env:GH_TOKEN (can't use GITHUB prefix: https://help.github.com/en/articles/virtual-environments-for-github-actions#naming-conventions)
 
+$env:GITHUB_TOKEN = ($env:GITHUB_TOKEN, $env:GH_TOKEN) | Where-Object {$_} | Select-Object -First 1
 $event = Get-Content $env:GITHUB_EVENT_PATH | ConvertFrom-Json
 $description = $event.issue.title -replace "^New Repo: "
 $name = $description.ToLowerInvariant() -replace "[^a-z0-9]+", '-'
-$body_first_line = $event.issue.body -split "`n" | ? {$_} | select -first 1
+$body_first_line = $event.issue.body -split "`n" | Where-Object {$_} | Select-Object -First 1
 $name_match = "^(name|tag|url): "
 if ($body_first_line -match $name_match) {
   $name = $body_first_line -replace $name_match
@@ -30,7 +31,7 @@ $restParams = @{
   Method = 'Post'
   Uri = $event.issue.comments_url
   Headers = @{
-    'Authorization' = "token $env:GH_TOKEN"
+    'Authorization' = "token $env:GITHUB_TOKEN"
   }
   ContentType = 'application/json'
   Body = @{
