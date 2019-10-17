@@ -52,4 +52,4 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Run the repository creation script
-    - run: echo "creating repository placeholder"
+      run: echo "creating repository placeholder"
