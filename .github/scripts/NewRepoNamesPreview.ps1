@@ -2,7 +2,7 @@
 
 # This script should only be run by Actions with the following variables set:
 # $env:GITHUB_EVENT_PATH (set in Actions by default)
-# $env:GITHUB_TOKEN
+# $env:GH_TOKEN (can't use GITHUB prefix: https://help.github.com/en/articles/virtual-environments-for-github-actions#naming-conventions)
 
 $event = Get-Content $env:GITHUB_EVENT_PATH | ConvertFrom-Json
 $description = $event.issue.title -replace "^New Repo: "
@@ -21,7 +21,7 @@ $restParams = @{
   Method = 'Post'
   Uri = $event.issue.comments_url
   Headers = @{
-    'Authorization' = "token $env:GITHUB_TOKEN"
+    'Authorization' = "token $env:GH_TOKEN"
   }
   ContentType = 'application/json'
   Body = @{
