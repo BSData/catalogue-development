@@ -37,7 +37,7 @@ jobs:
       - uses: actions/checkout@v1
       - name: Comment on the issue with preview information for new repo
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: pwsh
         run: './.github/scripts/NewRepoNamesPreview.ps1'
 
