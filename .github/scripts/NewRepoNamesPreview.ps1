@@ -15,7 +15,7 @@ $restParams = @{
   }
   ContentType = 'application/json'
   Body = @{
-    'body' = $comment
+    'body' = $info.PreviewComment
   } | ConvertTo-Json
 }
 Invoke-RestMethod @restParams
