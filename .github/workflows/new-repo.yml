@@ -58,6 +58,7 @@ jobs:
       run: |
         Install-Module PowerShellForGitHub -Force
         Set-GitHubConfiguration -SuppressTelemetryReminder
+        $event = Get-Content $env:GITHUB_EVENT_PATH | ConvertFrom-Json
         $info = ./.github/scripts/Get-NewRepoInfo.ps1
         $newRepoParams = @{
             AccessToken = $env:CREATE_REPO_TOKEN
@@ -65,3 +66,15 @@ jobs:
         $newRepoParams.Remove('PreviewComment')
         $result = ./.github/scripts/New-BsdataRepo.ps1 @newRepoParams -Verbose
         Write-Host $result
+        $commentParams = @{
+            Method = 'Post'
+            Uri = $event.issue.comments_url
+            Headers = @{
+                Authorization = "token $env:GITHUB_TOKEN"
+            }
+            ContentType = 'application/json'
+            Body = @{
+                'body' = "**Created:** $($result.CreateRepo.html_url)"
+            } | ConvertTo-Json
+        }
+        Invoke-RestMethod @commentParams
