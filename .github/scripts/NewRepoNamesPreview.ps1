@@ -4,18 +4,20 @@
 # $env:GITHUB_EVENT_PATH (set in Actions by default)
 # $env:GITHUB_TOKEN
 
+[CmdletBinding()] param()
+
 $event = Get-Content $env:GITHUB_EVENT_PATH | ConvertFrom-Json
 $info = & "$PSScriptRoot/Get-NewRepoInfo.ps1"
-Write-Output $info.PreviewComment
+Write-Verbose $info.PreviewComment
 $restParams = @{
-  Method = 'Post'
-  Uri = $event.issue.comments_url
-  Headers = @{
-    'Authorization' = "token $env:GITHUB_TOKEN"
-  }
-  ContentType = 'application/json'
-  Body = @{
-    'body' = $info.PreviewComment
-  } | ConvertTo-Json
+    Method = 'Post'
+    Uri = $event.issue.comments_url
+    Headers = @{
+        'Authorization' = "token $env:GITHUB_TOKEN"
+    }
+    ContentType = 'application/json'
+    Body = @{
+        'body' = $info.PreviewComment
+    } | ConvertTo-Json
 }
 Invoke-RestMethod @restParams
