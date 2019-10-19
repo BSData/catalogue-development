@@ -11,7 +11,7 @@ $body_first_line = $event.issue.body -split "`n" | Where-Object {$_} | Select-Ob
 $name_match = "^(name|tag|url): "
 if ($body_first_line -match $name_match)
 {
-    $name = $body_first_line -replace $name_match
+    $name = $body_first_line.Trim() -replace $name_match
 }
 else
 {
