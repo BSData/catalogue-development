@@ -51,4 +51,17 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Run the repository creation script
-      run: echo "creating repository placeholder"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        CREATE_REPO_TOKEN: ${{ secrets.AMIS92_REPO_CREATION_GITHUB_TOKEN }}
+      shell: pwsh
+      run: |
+        Install-Module PowerShellForGitHub -Force
+        Set-GitHubConfiguration -SuppressTelemetryReminder
+        $info = ./.github/scripts/Get-NewRepoInfo.ps1
+        $newRepoParams = @{
+            AccessToken = $env:CREATE_REPO_TOKEN
+        } + $info
+        $newRepoParams.Remove('PreviewComment')
+        $result = ./.github/scripts/New-BsdataRepo.ps1 @newRepoParams -Verbose
+        Write-Host $result
