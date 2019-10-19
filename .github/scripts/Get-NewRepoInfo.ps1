@@ -34,7 +34,7 @@ $comment = (
     "Comment ``.preview`` to re-check, ``.approve`` (owner only) to create the new repository as shown above."
     ) -join "`n"
 return @{
-    RepoName = $name
+    RepositoryName = $name
     Description = $description
     PreviewComment = $comment
     Collaborators = $collaborators

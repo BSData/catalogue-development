@@ -12,7 +12,7 @@ param (
     [string] $OwnerName = 'BSData',
     # Repo description
     [string] $Description = $RepositoryName,
-    # Keep authenticated user as collaborator
+    # Keep $env:GITHUB_ACTOR as collaborator (by default is removed)
     [switch] $KeepCreator,
     # List of collaborators to invite
     [string[]] $Collaborators,
@@ -114,9 +114,9 @@ Write-Verbose "Topics set to $($result.UpdateTopics.names)"
 $result['UpdateReadme'] = UpdateReadme
 Write-Verbose "Readme updated"
 
-if (-not $KeepCreator)
+if (-not $KeepCreator -and $env:GITHUB_ACTOR)
 {
-    $login = (Get-GitHubUser -Current @authParams).login
+    $login = $env:GITHUB_ACTOR
     $uri = "/repos/$OwnerName/$RepositoryName/collaborators/$login"
     $result["RemoveCreator"] = Invoke-GHRestMethod -UriFragment $uri -Method Delete @authParams
     Write-Verbose "Collaborator removed: $login"
