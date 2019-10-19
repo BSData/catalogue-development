@@ -78,3 +78,15 @@ jobs:
             } | ConvertTo-Json
         }
         Invoke-RestMethod @commentParams
+        $closeParams = @{
+            Method = 'Patch'
+            Uri = $event.issue.url
+            Headers = @{
+                Authorization = "token $env:GITHUB_TOKEN"
+            }
+            ContentType = 'application/json'
+            Body = @{
+                'state' = 'closed'
+            } | ConvertTo-Json
+        }
+        Invoke-RestMethod @closeParams
