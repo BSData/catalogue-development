@@ -42,6 +42,12 @@ else {
 if ($isOwner) {
     # create the repo
     $info = & $PSScriptRoot/Get-NewRepoInfo.ps1
+    if (-not $info.NameAvailable) {
+        # name not available, treat as `.preview` command
+        Write-Host "Repo name taken, executing '.preview' command instead."
+        & $PSScriptRoot/NewRepoNamesPreview.ps1
+        exit 0
+    }
     $newRepoParams = @{
         AccessToken = $env:CREATE_REPO_TOKEN
     } + $info
