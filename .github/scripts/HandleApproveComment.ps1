@@ -8,8 +8,7 @@
 $event = Get-Content $env:GITHUB_EVENT_PATH | ConvertFrom-Json
 
 # check comment text
-if ('.approve' -ne $event.comment.body.Trim())
-{
+if ('.approve' -ne $event.comment.body.Trim()) {
     Write-Host "Comment formatted incorrectly." -ForegroundColor Cyan
     exit 0;
 }
@@ -46,8 +45,7 @@ if ($isOwner) {
     $newRepoParams = @{
         AccessToken = $env:CREATE_REPO_TOKEN
     } + $info
-    $newRepoParams.Remove('PreviewComment')
-    # install module for bsdatarepo
+    # install module for bsdatarepo creation
     Install-Module PowerShellForGitHub -Force
     $result = ./.github/scripts/New-BsdataRepo.ps1 @newRepoParams -Verbose
     Write-Host $result
