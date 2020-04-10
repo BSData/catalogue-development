@@ -1,7 +1,8 @@
 #!/usr/bin/env pwsh
 
-# This script should only be run with the following variable set:
-# $env:GITHUB_EVENT_PATH (set in Actions by default)
+# This script should only be run with the following env variable set:
+# GITHUB_EVENT_PATH (set in Actions by default)
+# CREATE_REPO_TOKEN
 
 [CmdletBinding()] param()
 
@@ -29,6 +30,9 @@ $name = ($name.ToLowerInvariant() -replace "[^a-z0-9]+", '-').Trim('-')
 $repoCheckParams = @{
     Method = 'Get'
     Uri    = "https://api.github.com/repos/" + $event.organization.login + "/$name"
+    Headers     = @{
+        'Authorization' = "token $env:CREATE_REPO_TOKEN"
+    }
 }
 $repoObject = Invoke-RestMethod @repoCheckParams -SkipHttpErrorCheck -StatusCodeVariable repoCheckStatus
 $repoNameAvailable = $repoCheckStatus -ne 200

@@ -27,15 +27,18 @@ if (!$info.NameAvailable) {
 Write-Verbose $comment
 
 # post the comment
+$bodyJson = @{
+    'body' = $comment
+} | ConvertTo-Json
+$body = [System.Text.Encoding]::UTF8.GetBytes($bodyJson)
 $restParams = @{
     Method      = 'Post'
     Uri         = $event.issue.comments_url
     Headers     = @{
         'Authorization' = "token $env:GITHUB_TOKEN"
     }
-    ContentType = 'application/json'
-    Body        = @{
-        'body' = $comment
-    } | ConvertTo-Json
+    ContentType = 'application/json; charset=utf-8'
+    SkipHeaderValidation = $true
+    Body        = $body
 }
 Invoke-RestMethod @restParams
