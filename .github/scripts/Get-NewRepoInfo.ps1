@@ -20,7 +20,7 @@ else
 $name = ($name.ToLowerInvariant() -replace "[^a-z0-9]+", '-').Trim('-')
 $collaborators = @($event.issue.user.login)
 # TODO support adding more collaborators via OP tag like "collaborators: @login1 @login2 ..."
-$commentFormat = Get-Content $PSScriptRoot/newrepoinfo.md
+$commentFormat = Get-Content $PSScriptRoot/newrepoinfo.md -Raw
 $comment = $commentFormat -f $name, $description, "$($collaborators | ForEach-Object { "@$_" } )"
 return @{
     RepositoryName = $name
