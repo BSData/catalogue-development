@@ -49,13 +49,21 @@ if ($isOwner) {
         exit 0
     }
     $newRepoParams = @{
+        RepositoryName = $info.RepositoryName
+        Description = $info.Description
+        Collaborators = $info.Collaborators
         AccessToken = $env:CREATE_REPO_TOKEN
-    } + $info
-    # install module for bsdatarepo creation
-    Install-Module PowerShellForGitHub -Force
-    $result = ./.github/scripts/New-BsdataRepo.ps1 @newRepoParams -Verbose
-    Write-Host $result
-    $commentText = "**Created:** $($result.CreateRepo.html_url)"
+    }
+    try {
+        # install module for bsdatarepo creation
+        Install-Module PowerShellForGitHub -Force
+        $result = ./.github/scripts/New-BsdataRepo.ps1 @newRepoParams -Verbose
+        Write-Host $result
+        $commentText = "**Created:** $($result.CreateRepo.html_url)"
+    }
+    catch {
+        $commentText = "Operation failed. See https://github.com/BSData/catalogue-development/runs/$env:GITHUB_RUN_ID"
+    }
 }
 else {
     # inform in the comment only an owner can do that
