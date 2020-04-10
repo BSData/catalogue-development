@@ -13,15 +13,14 @@ $event = Get-Content $env:GITHUB_EVENT_PATH | ConvertFrom-Json
 $info = & "$PSScriptRoot/Get-NewRepoInfo.ps1"
 
 # format the comment
-$commentFormat = Get-Content $PSScriptRoot/newrepoinfo.md -Raw
-$comment = $commentFormat -f $info.RepositoryName, $info.Description, "$($info.Collaborators | ForEach-Object { "@$_" } )"
-if (!$info.NameAvailable) {
-    $commentPrefix = "> ⚠ Repository with this name already exists: " + $info.ExistingRepoUrl + "`n"
-    $commentPrefix += "> `n"
-    $commentPrefix += "> Please select a **different name**, or contact maintainers of the existing repository.`n"
-    $commentPrefix += "`n"
-    $comment = $commentPrefix + $comment
+if ($info.NameAvailable)
+{
+    $commentFormat = Get-Content $PSScriptRoot/RepoInfoPreviewComment.md -Raw
+} else {
+    $commentFormat = Get-Content $PSScriptRoot/RepoExistsComment.md -Raw
 }
+$collaborators = "$($info.Collaborators | ForEach-Object { "@$_" } )"
+$comment = $commentFormat -f $info.RepositoryName, $info.Description, $collaborators, $info.ExistingRepoUrl
 
 # print the comment
 Write-Verbose $comment
