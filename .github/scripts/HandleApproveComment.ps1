@@ -7,6 +7,9 @@
 
 $event = Get-Content $env:GITHUB_EVENT_PATH | ConvertFrom-Json
 
+# print the event
+$event | ConvertTo-Json
+
 # check comment text
 if ('.approve' -ne $event.comment.body.Trim())
 {
