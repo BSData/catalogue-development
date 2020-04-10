@@ -2,9 +2,9 @@ name: New repo creator
 
 on:
   issues:
-    types: [opened]
+    types: [ opened, edited ]
   issue_comment:
-    types: [created]
+    types: [ created ]
 
 jobs:
   handle_new:
@@ -46,7 +46,6 @@ jobs:
     if: |
       github.event_name == 'issue_comment' &&
       contains(github.event.issue.labels.*.name, 'new repo') &&
-      github.actor == 'amis92' &&
       github.event.comment.body == '.approve'
     steps:
     - uses: actions/checkout@v1
@@ -55,38 +54,4 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         CREATE_REPO_TOKEN: ${{ secrets.AMIS92_REPO_CREATION_GITHUB_TOKEN }}
       shell: pwsh
-      run: |
-        Install-Module PowerShellForGitHub -Force
-        Set-GitHubConfiguration -SuppressTelemetryReminder
-        $event = Get-Content $env:GITHUB_EVENT_PATH | ConvertFrom-Json
-        $info = ./.github/scripts/Get-NewRepoInfo.ps1
-        $newRepoParams = @{
-            AccessToken = $env:CREATE_REPO_TOKEN
-        } + $info
-        $newRepoParams.Remove('PreviewComment')
-        $result = ./.github/scripts/New-BsdataRepo.ps1 @newRepoParams -Verbose
-        Write-Host $result
-        $commentParams = @{
-            Method = 'Post'
-            Uri = $event.issue.comments_url
-            Headers = @{
-                Authorization = "token $env:GITHUB_TOKEN"
-            }
-            ContentType = 'application/json'
-            Body = @{
-                'body' = "**Created:** $($result.CreateRepo.html_url)"
-            } | ConvertTo-Json
-        }
-        Invoke-RestMethod @commentParams
-        $closeParams = @{
-            Method = 'Patch'
-            Uri = $event.issue.url
-            Headers = @{
-                Authorization = "token $env:GITHUB_TOKEN"
-            }
-            ContentType = 'application/json'
-            Body = @{
-                'state' = 'closed'
-            } | ConvertTo-Json
-        }
-        Invoke-RestMethod @closeParams
+      run: './.github/scripts/HandleApproveComment.ps1'
