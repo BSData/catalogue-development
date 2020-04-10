@@ -7,9 +7,6 @@
 
 $event = Get-Content $env:GITHUB_EVENT_PATH | ConvertFrom-Json
 
-# print the event
-$event | ConvertTo-Json
-
 # check comment text
 if ('.approve' -ne $event.comment.body.Trim())
 {
@@ -22,13 +19,16 @@ $author = $env:GITHUB_ACTOR
 # check whether comment author is org owner
 $membershipParams = @{
     Method  = 'Get'
-    Uri     = $event.repository.owner.url + "/memberships/$author"
+    Uri     = "https://api.github.com/orgs/$($event.repository.owner.login)/memberships/$author"
     Headers = @{
         Authorization = "token $env:CREATE_REPO_TOKEN"
     }
 }
 $membership = Invoke-RestMethod @membershipParams -SkipHttpErrorCheck -StatusCodeVariable memberStatusCode
 $isOwner = $false
+Write-Host "Membership response code: $memberStatusCode"
+Write-Host "Membership response content:"
+ConvertTo-Json $membership -Depth 5 | Write-Host
 if ($memberStatusCode -ne 200) {
     Write-Host "Author not a member of organization." -ForegroundColor Cyan
 }
