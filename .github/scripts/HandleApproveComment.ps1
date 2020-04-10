@@ -6,6 +6,14 @@
 # - CREATE_REPO_TOKEN
 
 $event = Get-Content $env:GITHUB_EVENT_PATH | ConvertFrom-Json
+
+# check comment text
+if ('.approve' -ne $event.comment.body.Trim())
+{
+    Write-Host "Comment formatted incorrectly." -ForegroundColor Cyan
+    exit 0;
+}
+
 $author = $env:GITHUB_ACTOR
 
 # check whether comment author is org owner

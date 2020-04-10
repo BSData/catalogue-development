@@ -20,7 +20,7 @@ jobs:
           assignees: '["amis92"]'
           labels: '["new repo"]'
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Comment on the issue with preview information for new repo
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -32,23 +32,23 @@ jobs:
     if: |
       github.event_name == 'issue_comment' &&
       contains(github.event.issue.labels.*.name, 'new repo') &&
-      github.event.comment.body == '.preview'
+      startsWith(github.event.comment.body, '.preview')
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Comment on the issue with preview information for new repo
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: pwsh
-        run: './.github/scripts/NewRepoNamesPreview.ps1'
+        run: './.github/scripts/HandlePreviewComment.ps1'
 
-  create_repo:
+  approve_comment:
     runs-on: ubuntu-latest
     if: |
       github.event_name == 'issue_comment' &&
       contains(github.event.issue.labels.*.name, 'new repo') &&
-      github.event.comment.body == '.approve'
+      startsWith(github.event.comment.body, '.approve')
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
     - name: Run the repository creation script
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
