@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       github.event_name == 'issues' &&
+      github.event.issue.state == 'open' &&
       startsWith(github.event.issue.title, 'New Repo')
     steps:
       - name: Add label and assign owner
@@ -32,6 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       github.event_name == 'issue_comment' &&
+      github.event.issue.state == 'open' &&
       contains(github.event.issue.labels.*.name, 'new repo') &&
       startsWith(github.event.comment.body, '.preview')
     steps:
@@ -47,6 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     if: |
       github.event_name == 'issue_comment' &&
+      github.event.issue.state == 'open' &&
       contains(github.event.issue.labels.*.name, 'new repo') &&
       startsWith(github.event.comment.body, '.approve')
     steps:
