@@ -19,11 +19,12 @@ $author = $env:GITHUB_ACTOR
 # check whether comment author is org owner
 $membershipParams = @{
     Method  = 'Get'
-    Uri     = "https://api.github.com/orgs/$($event.repository.owner.login)/memberships/$author"
+    Uri     = $event.organization.url + "/memberships/$author"
     Headers = @{
         Authorization = "token $env:CREATE_REPO_TOKEN"
     }
 }
+Write-Host "Membership Uri: $($membershipParams.Uri)"
 $membership = Invoke-RestMethod @membershipParams -SkipHttpErrorCheck -StatusCodeVariable memberStatusCode
 $isOwner = $false
 Write-Host "Membership response code: $memberStatusCode"
