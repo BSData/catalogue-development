@@ -25,7 +25,7 @@ jobs:
       - name: Comment on the issue with preview information for new repo
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CREATE_REPO_TOKEN: ${{ secrets.AMIS92_REPO_CREATION_GITHUB_TOKEN }}
+          CREATE_REPO_TOKEN: ${{ secrets.ORG_REPO_WRITE_TOKEN }}
         shell: pwsh
         run: './.github/scripts/NewRepoNamesPreview.ps1'
     
@@ -41,7 +41,7 @@ jobs:
       - name: Comment on the issue with preview information for new repo
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CREATE_REPO_TOKEN: ${{ secrets.AMIS92_REPO_CREATION_GITHUB_TOKEN }}
+          CREATE_REPO_TOKEN: ${{ secrets.ORG_REPO_WRITE_TOKEN }}
         shell: pwsh
         run: './.github/scripts/HandlePreviewComment.ps1'
 
@@ -57,6 +57,6 @@ jobs:
     - name: Run the repository creation script
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        CREATE_REPO_TOKEN: ${{ secrets.AMIS92_REPO_CREATION_GITHUB_TOKEN }}
+        CREATE_REPO_TOKEN: ${{ secrets.ORG_REPO_WRITE_TOKEN }}
       shell: pwsh
       run: './.github/scripts/HandleApproveComment.ps1'
