@@ -6,6 +6,7 @@ param(
     [string]
     $IssueTitle,
     [Parameter(Mandatory)]
+    [AllowEmptyString()]
     [string]
     $IssueBody,
     [Parameter(Mandatory)]
