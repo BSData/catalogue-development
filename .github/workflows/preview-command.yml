@@ -29,7 +29,7 @@ jobs:
         shell: pwsh
         env:
           EVENT_JSON: ${{ toJson(github.event.client_payload.github.payload) }}
-        run: './github/scripts/GetPreviewComment.ps1 ($env:EVENT_JSON | ConvertFrom-Json)'
+        run: './.github/scripts/GetPreviewComment.ps1 ($env:EVENT_JSON | ConvertFrom-Json)'
       - name: Add reaction to command comment on success
         uses: peter-evans/create-or-update-comment@v1
         with:

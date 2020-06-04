@@ -30,7 +30,7 @@ jobs:
         env:
           EVENT_JSON: ${{ toJson(github.event.client_payload.github.payload) }}
           TOKEN: ${{ secrets.ORG_REPO_WRITE_TOKEN }}
-        run: './github/scripts/HandleApproveComment.ps1 ($env:EVENT_JSON | ConvertFrom-Json) -Token $env:TOKEN'
+        run: './.github/scripts/HandleApproveComment.ps1 ($env:EVENT_JSON | ConvertFrom-Json) -Token $env:TOKEN'
       - name: Add reaction to command comment on success
         uses: peter-evans/create-or-update-comment@v1
         with:

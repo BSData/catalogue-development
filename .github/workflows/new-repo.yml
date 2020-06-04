@@ -27,7 +27,7 @@ jobs:
         shell: pwsh
         env:
           EVENT_JSON: ${{ toJson(github.event) }}
-        run: './github/scripts/GetPreviewComment.ps1 ($env:EVENT_JSON | ConvertFrom-Json)'
+        run: './.github/scripts/GetPreviewComment.ps1 ($env:EVENT_JSON | ConvertFrom-Json)'
       - name: Create comment with preview info
         uses: actions/github-script@v1
         env:
