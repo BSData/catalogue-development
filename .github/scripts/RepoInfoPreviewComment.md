@@ -9,6 +9,6 @@ If you'd like to change either of these:
 * _description_ is taken from the issue title, skipping `New Repo: ` prefix - to change, edit issue title.
 * _collaborators_ should include request author (OP).
 
-Comment `.preview` to request this check again.
+Comment `/preview` to request this check again.
 
-(**BSData organization owner only**): Comment `.approve` to create the new repository as shown above.
+(**BSData organization owner only**): Comment `/approve` to create the new repository as shown above.

@@ -13,4 +13,4 @@ If you'd like to change either of these:
 * _description_ is taken from the issue title, skipping `New Repo: ` prefix - to change, edit issue title.
 * _collaborators_ should include request author (OP).
 
-Comment `.preview` to request this check again.
+Comment `/preview` to request this check again.
