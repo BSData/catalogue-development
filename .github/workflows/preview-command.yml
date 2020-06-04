@@ -2,7 +2,7 @@ name: New repo preview
 # trigger by chatops '/preview'
 on:
   repository_dispatch:
-    types: [approve-command]
+    types: [preview-command]
 jobs:
   publish:
     runs-on: ubuntu-latest
