@@ -49,6 +49,6 @@ return @{
     RepositoryName = $name
     Description    = $description
     Collaborators  = @($IssueAuthor)
-    NameAvailable  = $repoCheckStatus -ne 404
+    NameAvailable  = $repoCheckStatus -eq 404
     RepositoryUrl  = $repoCheckParams.Uri
 }
