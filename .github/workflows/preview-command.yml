@@ -1,0 +1,45 @@
+name: New repo preview
+# trigger by chatops '/preview'
+on:
+  repository_dispatch:
+    types: [approve-command]
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Link to this workflow in command comment
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: "[Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+      - name: Check preconditions
+        id: check
+        uses: actions/github-script@v1
+        with:
+          script: |
+            const issue = context.payload.client_payload.github.payload.issue
+            if (issue.state !== 'open' || !issue.labels.some(x => x.name === 'new repo')) {
+              const msg = "Issue must be open and labeled 'new repo'"
+              core.setOutput('error', msg)
+              core.setFailed(msg)
+            }
+      - uses: actions/checkout@v2
+      - name: Run preview comment creation script
+        id: create_script
+        shell: pwsh
+        env:
+          EVENT_JSON: ${{ toJson(github.event.client_payload.github.payload) }}
+        run: './github/scripts/GetPreviewComment.ps1 ($env:EVENT_JSON | ConvertFrom-Json)'
+      - name: Add reaction to command comment on success
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: "\n\n${{ steps.create_script.outputs.comment }}"
+          reactions: hooray
+      - name: Add reaction to command comment on failure
+        uses: peter-evans/create-or-update-comment@v1
+        if: failure()
+        with:
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          body: ":poop: ${{ steps.check.outputs.error }}"
+          reactions: "-1"

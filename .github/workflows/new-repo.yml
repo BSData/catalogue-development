@@ -1,62 +1,42 @@
-name: New repo creator
+name: New repo issue
 
 on:
   issues:
     types: [ opened, edited ]
-  issue_comment:
-    types: [ created ]
 
 jobs:
   handle_new:
     runs-on: ubuntu-latest
     if: |
-      github.event_name == 'issues' &&
       github.event.issue.state == 'open' &&
       startsWith(github.event.issue.title, 'New Repo')
     steps:
-      - name: Add label and assign owner
-        uses: Naturalclar/issue-action@v1.0.0
+      - name: Add 'new repo' label
+        if: "!contains(github.event.issue.labels.*.name, 'new repo')"
+        uses: actions/github-script@v1
         with:
-          keywords: '["New Repo"]'
-          assignees: '["amis92"]'
-          labels: '["new repo"]'
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.issues.addLabels({
+              ...context.repo,
+              issue_number: context.issue.number,
+              labels: ['new repo']}
+            )
       - uses: actions/checkout@v2
-      - name: Comment on the issue with preview information for new repo
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CREATE_REPO_TOKEN: ${{ secrets.ORG_REPO_WRITE_TOKEN }}
+      - name: Run preview comment creation script
+        id: create_script
         shell: pwsh
-        run: './.github/scripts/NewRepoNamesPreview.ps1'
-    
-  preview_comment:
-    runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'issue_comment' &&
-      github.event.issue.state == 'open' &&
-      contains(github.event.issue.labels.*.name, 'new repo') &&
-      startsWith(github.event.comment.body, '.preview')
-    steps:
-      - uses: actions/checkout@v2
-      - name: Comment on the issue with preview information for new repo
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CREATE_REPO_TOKEN: ${{ secrets.ORG_REPO_WRITE_TOKEN }}
-        shell: pwsh
-        run: './.github/scripts/HandlePreviewComment.ps1'
-
-  approve_comment:
-    runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'issue_comment' &&
-      github.event.issue.state == 'open' &&
-      contains(github.event.issue.labels.*.name, 'new repo') &&
-      startsWith(github.event.comment.body, '.approve')
-    steps:
-    - uses: actions/checkout@v2
-    - name: Run the repository creation script
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        CREATE_REPO_TOKEN: ${{ secrets.ORG_REPO_WRITE_TOKEN }}
-      shell: pwsh
-      run: './.github/scripts/HandleApproveComment.ps1'
+          EVENT_JSON: ${{ toJson(github.event) }}
+        run: './github/scripts/GetPreviewComment.ps1 ($env:EVENT_JSON | ConvertFrom-Json)'
+      - name: Create comment with preview info
+        uses: actions/github-script@v1
+        env:
+          COMMENT_TEXT: ${{ steps.create_script.outputs.comment }}
+        with:
+          script: |
+            const comment = process.env.COMMENT_TEXT
+            await github.issues.createComment({
+              ...context.repo,
+              issue_number: context.issue.number,
+              body: comment
+            })
