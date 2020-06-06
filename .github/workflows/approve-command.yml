@@ -35,7 +35,6 @@ jobs:
         uses: peter-evans/create-or-update-comment@v1
         with:
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
-          body: "**Created:** ${{ steps.create_script.outputs.url }}"
           reactions: hooray
       - name: Add reaction to command comment on failure
         uses: peter-evans/create-or-update-comment@v1
@@ -44,3 +43,8 @@ jobs:
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           body: ":poop: ${{ steps.create_script.outputs.error }} ${{ steps.check.outputs.error }}"
           reactions: "-1"
+      - name: Close issue
+        uses: peter-evans/close-issue@v1
+        with:
+          issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
+          comment: "**Created:** ${{ steps.create_script.outputs.url }}"
