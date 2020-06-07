@@ -4,7 +4,7 @@ on:
   repository_dispatch:
     types: [approve-command]
 jobs:
-  publish:
+  approve:
     runs-on: ubuntu-latest
     steps:
       - name: Link to this workflow in command comment

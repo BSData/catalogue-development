@@ -4,7 +4,7 @@ on:
   repository_dispatch:
     types: [preview-command]
 jobs:
-  publish:
+  preview:
     runs-on: ubuntu-latest
     steps:
       - name: Link to this workflow in command comment

@@ -29,14 +29,7 @@ jobs:
           EVENT_JSON: ${{ toJson(github.event) }}
         run: './.github/scripts/GetPreviewComment.ps1 ($env:EVENT_JSON | ConvertFrom-Json)'
       - name: Create comment with preview info
-        uses: actions/github-script@v1
-        env:
-          COMMENT_TEXT: ${{ steps.create_script.outputs.comment }}
+        uses: peter-evans/create-or-update-comment@v1
         with:
-          script: |
-            const comment = process.env.COMMENT_TEXT
-            await github.issues.createComment({
-              ...context.repo,
-              issue_number: context.issue.number,
-              body: comment
-            })
+          issue-number: ${{ github.event.issue.number }}
+          body: ${{ steps.create_script.outputs.comment }}
