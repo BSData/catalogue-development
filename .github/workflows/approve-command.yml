@@ -36,12 +36,6 @@ jobs:
           script: |
             ./.github/scripts/HandleApproveComment.ps1 $github.event.client_payload.github.payload -Token $env:TOKEN
 
-      - name: Add reaction to command comment on success
-        uses: peter-evans/create-or-update-comment@v1
-        with:
-          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
-          reactions: hooray
-
       - name: Add reaction to command comment on failure
         uses: peter-evans/create-or-update-comment@v1
         if: failure()
@@ -49,6 +43,22 @@ jobs:
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           body: ":poop: ${{ steps.create_script.outputs.error }} ${{ steps.check.outputs.error }}"
           reactions: "-1"
+
+      - name: Add reaction to command comment on success
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          reactions: hooray
+
+      - name: Add 'created' label
+        uses: actions/github-script@v3
+        with:
+          script: |
+            await github.issues.addLabels({
+              ...context.repo,
+              issue_number: context.payload.client_payload.github.payload.issue.number,
+              labels: ['created']
+            })
 
       - name: Close issue
         uses: peter-evans/close-issue@v1

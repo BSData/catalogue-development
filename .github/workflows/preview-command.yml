@@ -15,7 +15,7 @@ jobs:
 
       - name: Check preconditions
         id: check
-        uses: actions/github-script@v1
+        uses: actions/github-script@v3
         with:
           script: |
             const issue = context.payload.client_payload.github.payload.issue

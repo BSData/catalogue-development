@@ -13,14 +13,14 @@ jobs:
     steps:
       - name: Add 'new repo' label
         if: "!contains(github.event.issue.labels.*.name, 'new repo')"
-        uses: actions/github-script@v1
+        uses: actions/github-script@v3
         with:
           script: |
             await github.issues.addLabels({
               ...context.repo,
               issue_number: context.issue.number,
-              labels: ['new repo']}
-            )
+              labels: ['new repo']
+            })
 
       - uses: actions/checkout@v2
 
