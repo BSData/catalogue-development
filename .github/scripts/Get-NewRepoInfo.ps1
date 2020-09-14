@@ -3,18 +3,17 @@
 [CmdletBinding(SupportsShouldProcess)]
 param(
     [Parameter(Mandatory)]
-    [string]
-    $IssueTitle,
+    [string] $IssueTitle,
+    
     [Parameter(Mandatory)]
     [AllowEmptyString()]
-    [string]
-    $IssueBody,
+    [string] $IssueBody,
+
     [Parameter(Mandatory)]
-    [string]
-    $IssueAuthor,
+    [string] $IssueAuthor,
+
     [Parameter()]
-    [string]
-    $TargetOrganization = 'BSData'
+    [string] $TargetOrganization = 'BSData'
 )
 
 # get description from issue title

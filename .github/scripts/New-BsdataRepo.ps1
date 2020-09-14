@@ -22,13 +22,11 @@ param (
 
 Write-Verbose "Processing parameters"
 # defaulting description from name
-if ([string]::IsNullOrWhiteSpace($Description))
-{
+if ([string]::IsNullOrWhiteSpace($Description)) {
     $Description = $RepositoryName
 }
 $sanitizedName = $RepositoryName.ToLowerInvariant() -replace "[^a-z0-9]+", "-"
-if ($sanitizedName -ne $RepositoryName)
-{
+if ($sanitizedName -ne $RepositoryName) {
     Write-Warning "Sanitized RepositoryName: '$RepositoryName' -> '$sanitizedName'"
     $RepositoryName = $sanitizedName
 }
@@ -36,7 +34,7 @@ $authParams = @{
     AccessToken = $AccessToken
 }
 $repoParams = @{
-    OwnerName = $OwnerName
+    OwnerName      = $OwnerName
     RepositoryName = $RepositoryName
 }
 $homepage = "http://battlescribedata.appspot.com/#/repo/$RepositoryName"
@@ -45,11 +43,11 @@ Write-Verbose "Starting operations."
 $result = @{}
 
 $newRepoParams = @{
-    OwnerName = $OwnerName
-    RepositoryName = "TemplateDataRepo"
-    TargetOwnerName = $OwnerName
+    OwnerName            = $OwnerName
+    RepositoryName       = "TemplateDataRepo"
+    TargetOwnerName      = $OwnerName
     TargetRepositoryName = $RepositoryName
-    Description = $Description
+    Description          = $Description
 }
 $repo = New-GitHubRepositoryFromTemplate @newRepoParams @authParams
 $result['CreateRepo'] = $repo
@@ -64,14 +62,14 @@ Write-Verbose "Homepage updated to $homepage"
 
 $topicsResponse = Get-GitHubRepositoryTopic @repoParams @authParams
 $topics = @($topicsResponse.names, "battlescribe-data") | Where-Object { $_ }
-    | Set-GitHubRepositoryTopic @repoParams @authParams -PassThru
+| Set-GitHubRepositoryTopic @repoParams @authParams -PassThru
 $result['UpdateTopics'] = $topics
 Write-Verbose "Topics set to $($topics.names)"
 
 $result['UpdateReadme'] = . {
     # https://developer.github.com/v3/repos/contents/#get-the-readme
     $getReadmeParams = @{
-        Method = 'GET'
+        Method      = 'GET'
         UriFragment = "/repos/$OwnerName/$RepositoryName/readme"
     }
     $getReadmeResult = Invoke-GHRestMethod @getReadmeParams @authParams
@@ -85,29 +83,28 @@ $result['UpdateReadme'] = . {
         return "Skipped"
     }
     $updateReadmeParams = @{
-        Path = $getReadmeResult.path
+        Path          = $getReadmeResult.path
         CommitMessage = "docs: Replace template values in README"
-        Content = $readmePatched
-        Sha = $getReadmeResult.sha
+        Content       = $readmePatched
+        Sha           = $getReadmeResult.sha
     }
     $repo | Set-GitHubContent @updateReadmeParams @authParams -PassThru
 }
 Write-Verbose "Readme updated"
 
-if (-not $KeepCreator -and $env:GITHUB_ACTOR)
-{
+if (-not $KeepCreator -and $env:GITHUB_ACTOR) {
     $login = $env:GITHUB_ACTOR
     $uri = "/repos/$OwnerName/$RepositoryName/collaborators/$login"
     $result["RemoveCreator"] = Invoke-GHRestMethod -UriFragment $uri -Method Delete @authParams
     Write-Verbose "Collaborator removed: $login"
 }
 $Collaborators
-    | ForEach-Object { $_ -replace "^@" }
-    | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
-    | ForEach-Object {
-        $login = $_
-        $uri = "/repos/$OwnerName/$RepositoryName/collaborators/$login"
-        $result["Invite-$login"] = Invoke-GHRestMethod -UriFragment $uri -Method Put @authParams
-        Write-Verbose "Collaborator added: $login"
+| ForEach-Object { $_ -replace "^@" }
+| Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+| ForEach-Object {
+    $login = $_
+    $uri = "/repos/$OwnerName/$RepositoryName/collaborators/$login"
+    $result["Invite-$login"] = Invoke-GHRestMethod -UriFragment $uri -Method Put @authParams
+    Write-Verbose "Collaborator added: $login"
 }
 return $result

@@ -12,6 +12,7 @@ jobs:
         with:
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           body: "[Workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+
       - name: Check preconditions
         id: check
         uses: actions/github-script@v1
@@ -23,19 +24,24 @@ jobs:
               core.setOutput('error', msg)
               core.setFailed(msg)
             }
+
       - uses: actions/checkout@v2
+
       - name: Run repo creation script
         id: create_script
-        shell: pwsh
+        uses: Amadevus/pwsh-script@v2
         env:
-          EVENT_JSON: ${{ toJson(github.event.client_payload.github.payload) }}
           TOKEN: ${{ secrets.ORG_REPO_WRITE_TOKEN }}
-        run: './.github/scripts/HandleApproveComment.ps1 ($env:EVENT_JSON | ConvertFrom-Json) -Token $env:TOKEN'
+        with:
+          script: |
+            ./.github/scripts/HandleApproveComment.ps1 $github.event.client_payload.github.payload -Token $env:TOKEN
+
       - name: Add reaction to command comment on success
         uses: peter-evans/create-or-update-comment@v1
         with:
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           reactions: hooray
+
       - name: Add reaction to command comment on failure
         uses: peter-evans/create-or-update-comment@v1
         if: failure()
@@ -43,8 +49,9 @@ jobs:
           comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
           body: ":poop: ${{ steps.create_script.outputs.error }} ${{ steps.check.outputs.error }}"
           reactions: "-1"
+
       - name: Close issue
         uses: peter-evans/close-issue@v1
         with:
           issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
-          comment: "**Created:** ${{ steps.create_script.outputs.url }}"
+          comment: "**Created:** ${{ fromJSON(steps.create_script.outputs.result).html_url }}"

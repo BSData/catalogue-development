@@ -1,17 +1,15 @@
 [CmdletBinding()]
+[OutputType([string])]
 param (
   [Parameter(Mandatory, Position = 0)]
-  [object]
-  $Event
+  [object] $EventPayload
 )
 
-$ErrorActionPreference = 'Stop'
-Import-Module "$PSScriptRoot/lib/GitHubActionsCore" -Force
 $infoArgs = @{
-  IssueTitle         = $Event.issue.title
-  IssueBody          = $Event.issue.body
-  IssueAuthor        = $Event.issue.user.login
-  TargetOrganization = $Event.organization.login
+  IssueTitle         = $EventPayload.issue.title
+  IssueBody          = $EventPayload.issue.body
+  IssueAuthor        = $EventPayload.issue.user.login
+  TargetOrganization = $EventPayload.organization.login
 }
 $info = & "$PSScriptRoot/Get-NewRepoInfo.ps1" @infoArgs
 # format the comment
@@ -23,4 +21,4 @@ else {
 }
 $collaborators = "$($info.Collaborators | ForEach-Object { "@$_" } )"
 $comment = $commentFormat -f $info.RepositoryName, $info.Description, $collaborators, $info.RepositoryUrl
-Set-ActionOutput 'comment' $comment
+return $comment

@@ -2,7 +2,7 @@ name: New repo issue
 
 on:
   issues:
-    types: [ opened, edited ]
+    types: [opened, edited]
 
 jobs:
   handle_new:
@@ -21,15 +21,17 @@ jobs:
               issue_number: context.issue.number,
               labels: ['new repo']}
             )
+
       - uses: actions/checkout@v2
+
       - name: Run preview comment creation script
         id: create_script
-        shell: pwsh
-        env:
-          EVENT_JSON: ${{ toJson(github.event) }}
-        run: './.github/scripts/GetPreviewComment.ps1 ($env:EVENT_JSON | ConvertFrom-Json)'
+        uses: Amadevus/pwsh-script@v2
+        with:
+          script: ./.github/scripts/GetPreviewComment.ps1 $github.event
+
       - name: Create comment with preview info
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.issue.number }}
-          body: ${{ steps.create_script.outputs.comment }}
+          body: ${{ steps.create_script.outputs.result }}

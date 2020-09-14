@@ -1,28 +1,21 @@
 [CmdletBinding()]
 param (
   [Parameter(Mandatory, Position = 0)]
-  [object]
-  $Event,
+  [object] $EventPayload,
+
   [Parameter(Mandatory)]
-  [string]
-  $Token
+  [string] $Token
 )
 
-$ErrorActionPreference = 'Stop'
-Import-Module "$PSScriptRoot/lib/GitHubActionsCore" -Force
-$event = $env:EVENT_JSON | ConvertFrom-Json
 $infoArgs = @{
-  IssueTitle         = $Event.issue.title
-  IssueBody          = $Event.issue.body
-  IssueAuthor        = $Event.issue.user.login
-  TargetOrganization = $Event.organization.login
+  IssueTitle         = $EventPayload.issue.title
+  IssueBody          = $EventPayload.issue.body
+  IssueAuthor        = $EventPayload.issue.user.login
+  TargetOrganization = $EventPayload.organization.login
 }
 $info = & "$PSScriptRoot/Get-NewRepoInfo.ps1" @infoArgs
 if (-not $info.NameAvailable) {
-  $errMessage = "Repository '$($info.RepositoryUrl)' already exists"
-  Set-ActionOutput 'error' $errMessage
-  Write-ActionError $errMessage
-  exit 1
+  throw "Repository '$($info.RepositoryUrl)' already exists"
 }
 # install module for bsdatarepo creation
 Install-Module PowerShellForGitHub -Force
@@ -33,4 +26,4 @@ $newRepoParams = @{
   AccessToken    = $Token
 }
 $result = & "$PSScriptRoot/New-BsdataRepo.ps1" @newRepoParams -Verbose
-Set-ActionOutput 'url' $result.CreateRepo.html_url
+return $result.CreateRepo
