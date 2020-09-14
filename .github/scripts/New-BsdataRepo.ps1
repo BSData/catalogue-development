@@ -100,7 +100,7 @@ $result['UpdateReadme'] = . {
         Body        = ConvertTo-Json @{
             'message' = "docs: Replace template values in README"
             'sha'     = $getReadmeResult.sha
-            'content' = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8($readmePatched))
+            'content' = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($readmePatched))
         }
     }
     Invoke-GHRestMethod @updateReadmeParams @authParams
