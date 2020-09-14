@@ -53,14 +53,26 @@ $repo = New-GitHubRepositoryFromTemplate @newRepoParams @authParams
 $result['CreateRepo'] = $repo
 Write-Verbose "Repo created at $($repo.html_url)"
 
-$result['SecureRepo'] = $repo | New-GitHubRepositoryBranchProtectionRule -BranchName $repo.default_branch -EnforceAdmins @authParams
+$result['SecureRepo'] = . {
+    $protectParams = @{
+        Method = 'Put'
+        UriFragment = "repos/$OwnerName/$RepositoryName/branches/$($repo.default_branch)/protection"
+        Body = @{
+            enforce_admins = $true
+            required_status_checks = $null
+            required_pull_request_reviews = $null
+            restrictions = $null
+        } | ConvertTo-Json
+    }
+    Invoke-GHRestMethod @protectParams @repoParams @authParams
+}
 Write-Verbose "Security rules applied"
 
-$result['UpdateHomepage'] = Update-GitHubRepository @repoParams @authParams -Homepage $homepage
+$result['UpdateHomepage'] = $repo | Update-GitHubRepository @authParams -Homepage $homepage
 Write-Verbose "Homepage updated to $homepage"
 
 
-$topicsResponse = Get-GitHubRepositoryTopic @repoParams @authParams
+$topicsResponse = $repo | Get-GitHubRepositoryTopic @authParams
 $topics = @($topicsResponse.names, "battlescribe-data") | Where-Object { $_ }
 | Set-GitHubRepositoryTopic @repoParams @authParams -PassThru
 $result['UpdateTopics'] = $topics
