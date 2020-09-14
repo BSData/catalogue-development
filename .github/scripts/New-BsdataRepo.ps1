@@ -55,7 +55,7 @@ Write-Verbose "Repo created at $($repo.html_url)"
 
 $result['SecureRepo'] = . {
     $protectParams = @{
-        Method      = 'Put'
+        Method      = 'PUT'
         UriFragment = "repos/$OwnerName/$RepositoryName/branches/$($repo.default_branch)/protection"
         Body        = @{
             enforce_admins                = $true
@@ -82,7 +82,7 @@ $result['UpdateReadme'] = . {
     # https://developer.github.com/v3/repos/contents/#get-the-readme
     $getReadmeParams = @{
         Method      = 'GET'
-        UriFragment = "/repos/$OwnerName/$RepositoryName/readme"
+        UriFragment = "repos/$OwnerName/$RepositoryName/readme"
     }
     $getReadmeResult = Invoke-GHRestMethod @getReadmeParams @authParams
     if ($getReadmeResult.encoding -ne 'base64') {
@@ -95,12 +95,15 @@ $result['UpdateReadme'] = . {
         return "Skipped"
     }
     $updateReadmeParams = @{
-        Path          = $getReadmeResult.path
-        CommitMessage = "docs: Replace template values in README"
-        Content       = $readmePatched
-        Sha           = $getReadmeResult.sha
+        Method      = 'PUT'
+        UriFragment = "repos/$OwnerName/$RepositoryName/contents/" + $getReadmeResult.path
+        Body        = ConvertTo-Json @{
+            'message' = "docs: Replace template values in README"
+            'sha'     = $getReadmeResult.sha
+            'content' = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8($readmePatched))
+        }
     }
-    $repo | Set-GitHubContent @updateReadmeParams @authParams -PassThru
+    Invoke-GHRestMethod @updateReadmeParams @authParams
 }
 Write-Verbose "Readme updated"
 
