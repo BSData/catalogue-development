@@ -26,7 +26,7 @@ if ([string]::IsNullOrWhiteSpace($Description)) {
     $Description = $RepositoryName
 }
 $sanitizedName = $RepositoryName.ToLowerInvariant() -replace "[^a-z0-9]+", "-"
-if ($sanitizedName -ne $RepositoryName) {
+if ($sanitizedName -cne $RepositoryName) {
     Write-Warning "Sanitized RepositoryName: '$RepositoryName' -> '$sanitizedName'"
     $RepositoryName = $sanitizedName
 }
@@ -55,16 +55,16 @@ Write-Verbose "Repo created at $($repo.html_url)"
 
 $result['SecureRepo'] = . {
     $protectParams = @{
-        Method = 'Put'
+        Method      = 'Put'
         UriFragment = "repos/$OwnerName/$RepositoryName/branches/$($repo.default_branch)/protection"
-        Body = @{
-            enforce_admins = $true
-            required_status_checks = $null
+        Body        = @{
+            enforce_admins                = $true
+            required_status_checks        = $null
             required_pull_request_reviews = $null
-            restrictions = $null
+            restrictions                  = $null
         } | ConvertTo-Json
     }
-    Invoke-GHRestMethod @protectParams @repoParams @authParams
+    Invoke-GHRestMethod @protectParams @authParams
 }
 Write-Verbose "Security rules applied"
 
