@@ -54,9 +54,10 @@ $result['CreateRepo'] = $repo
 Write-Verbose "Repo created at $($repo.html_url)"
 
 $result['SecureRepo'] = . {
+    $defaultBranch = $repo.default_branch
     $protectParams = @{
         Method      = 'PUT'
-        UriFragment = "repos/$OwnerName/$RepositoryName/branches/$($repo.default_branch)/protection"
+        UriFragment = "repos/$OwnerName/$RepositoryName/branches/$defaultBranch/protection"
         Body        = @{
             enforce_admins                = $true
             required_status_checks        = $null
@@ -64,6 +65,7 @@ $result['SecureRepo'] = . {
             restrictions                  = $null
         } | ConvertTo-Json
     }
+    Write-Verbose "Setting up protection on '$defaultBranch'..."
     Invoke-GHRestMethod @protectParams @authParams
 }
 Write-Verbose "Security rules applied"
