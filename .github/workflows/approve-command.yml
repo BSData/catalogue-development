@@ -60,8 +60,20 @@ jobs:
               labels: ['created']
             })
 
-      - name: Close issue
+      - name: Format closing comment
+        id: format
+        uses: Amadevus/pwsh-script@v2
+        env:
+          CREATE_RESULT: ${{ steps.create_script.outputs.result }}
+        with:
+          script: |
+            $text = Get-Content ./.github/scripts/RepoCreatedComment.md -Raw
+            $login = $github.event.client_payload.github.payload.issue.user.login
+            $repoUrl = ($env:CREATE_RESULT | ConvertFrom-Json).html_url
+            return $text -f $login, $repoUrl
+
+      - name: Comment and close issue
         uses: peter-evans/close-issue@v1
         with:
           issue-number: ${{ github.event.client_payload.github.payload.issue.number }}
-          comment: "**Created:** ${{ fromJSON(steps.create_script.outputs.result).html_url }}"
+          comment: ${{ steps.format.outputs.result }}
