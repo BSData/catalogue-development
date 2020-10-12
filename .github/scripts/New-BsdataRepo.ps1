@@ -54,7 +54,7 @@ $result['CreateRepo'] = $repo
 Write-Verbose "Repo created at $($repo.html_url)"
 
 $result['SecureRepo'] = . {
-    $defaultBranch = $repo.default_branch
+    $defaultBranch = ($repo | Get-GitHubRepository).default_branch
     $protectParams = @{
         Method      = 'PUT'
         UriFragment = "repos/$OwnerName/$RepositoryName/branches/$defaultBranch/protection"
