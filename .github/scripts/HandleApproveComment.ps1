@@ -18,7 +18,10 @@ if (-not $info.NameAvailable) {
   throw "Repository '$($info.RepositoryUrl)' already exists"
 }
 # install module for bsdatarepo creation
-Install-Module PowerShellForGitHub -Force
+$ProgressPreference, $oldProgressPref = 'SilentlyContinue', $ProgressPreference
+Install-Module PowerShellForGitHub -Force -Verbose:$false
+$ProgressPreference = $oldProgressPref
+# run script
 $newRepoParams = @{
   RepositoryName = $info.RepositoryName
   Description    = $info.Description

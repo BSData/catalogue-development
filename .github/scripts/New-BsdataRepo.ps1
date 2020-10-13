@@ -21,6 +21,8 @@ param (
 )
 
 Write-Verbose "Processing parameters"
+# disable telemetry for CI
+Set-GitHubConfiguration -DisableTelemetry
 # defaulting description from name
 if ([string]::IsNullOrWhiteSpace($Description)) {
     $Description = $RepositoryName
@@ -53,8 +55,11 @@ $repo = New-GitHubRepositoryFromTemplate @newRepoParams @authParams
 $result['CreateRepo'] = $repo
 Write-Verbose "Repo created at $($repo.html_url)"
 
+Write-Verbose "Waiting 10s to give GitHub some time to apply template..."
+Start-Sleep -Seconds 10 -Verbose
+
 $result['SecureRepo'] = . {
-    $defaultBranch = ($repo | Get-GitHubRepository).default_branch
+    $defaultBranch = ($repo | Get-GitHubRepository @authParams).default_branch
     $protectParams = @{
         Method      = 'PUT'
         UriFragment = "repos/$OwnerName/$RepositoryName/branches/$defaultBranch/protection"
