@@ -25,7 +25,7 @@ Don't forget to read through [wiki][], there are some useful guides - especially
 
 Join the data author community over at discord!
 
-[![Chat on Discord](https://img.shields.io/discord/558412685981777922.svg?logo=discord&style=popout-square)](https://discord.gg/KqPVhds)
+[![Chat on Discord](https://img.shields.io/discord/558412685981777922.svg?logo=discord&style=popout-square)](https://discord.gg/UrrPB3T)
 
 Cheers!
 
