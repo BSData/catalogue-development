@@ -1,6 +1,8 @@
 catalogue-development
 =====================
 
+[![Chat on Discord](https://img.shields.io/discord/558412685981777922.svg?logo=discord&style=popout-square)](https://www.bsdata.net/discord)
+
 A place to discuss and find tips about catalogue development.
 
 * [__Issues__](https://github.com/BSData/catalogue-development/issues) are a place to:
