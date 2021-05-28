@@ -31,7 +31,7 @@ jobs:
         id: create_script
         uses: Amadevus/pwsh-script@v2
         env:
-          TOKEN: ${{ secrets.ORG_REPO_WRITE_TOKEN }}
+          TOKEN: ${{ secrets.BSDATA_BOT_TOKEN }}
         with:
           script: |
             ./.github/scripts/HandleApproveComment.ps1 $github.event.client_payload.github.payload -Token $env:TOKEN
