@@ -125,8 +125,14 @@ $Collaborators
 | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
 | ForEach-Object {
     $login = $_
-    $uri = "/repos/$OwnerName/$RepositoryName/collaborators/$login"
-    $result["Invite-$login"] = Invoke-GHRestMethod -UriFragment $uri -Method Put @authParams
+    $inviteParams = @{
+        Method      = 'PUT'
+        UriFragment = "/repos/$OwnerName/$RepositoryName/collaborators/$login"
+        Body        = ConvertTo-Json @{
+            'permission' = 'maintain'
+        }
+    }
+    $result["Invite-$login"] = Invoke-GHRestMethod @inviteParams @authParams
     Write-Verbose "Collaborator added: $login"
 }
 return $result
